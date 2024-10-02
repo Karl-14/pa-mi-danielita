@@ -1,2 +1,3 @@
-Flask==3.0.3
-gunicorn  # Necesario para servir la aplicación
+Flask
+Flask-CORS
+gunicorn
