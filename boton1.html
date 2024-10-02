@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pa' mi danielita</title>
+    <style>
+        body {
+            font-family: Verdana, sans-serif;
+            background-color: #ffccff; /* Fondo rosado */
+            text-align: center;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 65%;
+            min-width: 300px;
+            max-width: 90%;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        select {
+            font-size: 20px;
+            padding: 10px;
+            margin-top: 20px;
+            width: 100%;
+            transition: background-color 0.5s ease, transform 0.5s ease; /* Transición suave */
+        }
+
+        select:hover {
+            background-color: #ffe6e6; /* Cambia de color al pasar el mouse */
+            transform: scale(1.05); /* Aumentar ligeramente el tamaño */
+        }
+
+        button {
+            font-size: 20px;
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: #ff4500;
+            color: white;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            display: none;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #ff6347;
+        }
+
+        .content {
+            margin-top: 30px;
+            animation: popUp 0.5s ease;
+        }
+
+        img, video {
+            margin-top: 20px;
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Estilos para el modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            text-align: center;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.8s ease;
+        }
+
+        .modal-content p {
+            margin-bottom: 20px; /* Añadir un margen inferior para separar el texto del botón */
+        }
+
+        .modal-content button {
+            display: block;
+            width: 100%;  /* Asegura que el botón ocupe todo el ancho */
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        .modal-content button:first-of-type {
+            margin-top: 20px; /* Añadimos margen superior al primer botón */
+        }
+
+        .modal button:hover {
+            background-color: #ff6347;
+        }
+
+        /* Estilos para reproductores de audio */
+        audio {
+            margin-top: 10px;
+            width: 100%; /* Ancho completo */
+            outline: none; /* Sin borde */
+            border-radius: 10px; /* Bordes redondeados */
+            background-color: #ffb3e6; /* Fondo llamativo para el audio */
+            border: 2px solid #ff69b4; /* Borde de color rosa fuerte */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Sombra */
+        }
+
+        /* Animaciones */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes popUp {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+input[type="text"], input[type="password"] {
+    font-size: 18px;
+    padding: 10px;
+    margin-top: 10px;
+    width: 100%;
+    border: 2px solid #ff69b4; /* Borde rosa */
+    border-radius: 5px; /* Bordes redondeados */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Sombra */
+    transition: border-color 0.3s ease; /* Transición suave */
+}
+
+input[type="text"]:focus, input[type="password"]:focus {
+    border-color: #ff4500; /* Cambia el color del borde al hacer foco */
+}
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <select id="content-type" onchange="toggleRandomButton()">
+            <option value="">Selecciona un tipo de archivo</option>
+            <option value="photos">Fotos</option>
+            <option value="videos">Videos</option>
+        </select>
+
+        <div>
+            <button id="random-button" onclick="attemptShowRandomContent()">Aleatorio</button>
+        </div>
+
+        <div class="content" id="content-display"></div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="love-modal">
+        <div class="modal-content">
+            <p>Primero, dime que me amas</p>
+            <button onclick="openWhatsApp()">Shi</button> <!-- El botón 'Shi' -->
+            <button onclick="closeModal()">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Aquí se mostrarán los reproductores de audio -->
+    <div id="audio-player-container" style="margin-top: 20px;"></div>
+    <script>
+        const photos = [
+            "https://www.dropbox.com/scl/fi/zrjvw537phqrmbpnj0nvs/IMG_20240930_231345_615.webp?rlkey=i8bljufyih7efdx21atdk6fof&st=yndz2jv7&dl=1",
+            "https://www.dropbox.com/scl/fi/vl8s8ajysh86f6yfcupi0/IMG_20240930_231509_904.webp?rlkey=hnh8zeu9byz2tg7rdrvtqgiw6&st=v9m7lkrr&dl=1",
+            "https://www.dropbox.com/scl/fi/ukfxlsi6ki84dosvuh4sl/IMG_20240930_231956_762.webp?rlkey=n3wesy66y2l94hdf4h8o5l63y&st=nkeam5jx&dl=1",
+            "https://www.dropbox.com/scl/fi/5cingr7a9o0n6y11naz1z/IMG_20240930_232336_316.webp?rlkey=1c6zxdpzrlsz4fhyzkx8vft87&st=w295smth&dl=1"
+        ];
+
+        const videos = [
+            "https://www.dropbox.com/scl/fi/vzbz5zp6oxq2m6p45qs0y/lv_0_20240930233336.mp4?rlkey=ql8vkiouanxz2swv568uyyv32&st=q97gfyqm&dl=1",
+            "https://www.dropbox.com/scl/fi/waigsvv5u5udytskszvr6/VID_46360407_161307_553.mp4?rlkey=gizihb4u96z5fwcdxq341sxhq&st=yd5jejp8&dl=1",
+            "https://www.dropbox.com/scl/fi/sr6ftn4nx5ahckowhdj3m/VID_46380519_220504_172.mp4?rlkey=enun3rubz1zw4g5ajemqp25v8&st=fovzh1l7&dl=1",
+            "https://www.dropbox.com/scl/fi/av5b7k584a8kew5ee43vs/VID_46680131_115508_536.mp4?rlkey=aqyfjmjp1b1dqnef0ihaddkz7&st=zr2frap3&dl=1"
+        ];
+
+        // Aquí puedes añadir tus enlaces de audio
+        const audios = [
+            "https://www.dropbox.com/scl/fi/20z3inwnm7f6lrm9542fk/audio1.mp3?rlkey=ertmmfwa9sqau8djqez4ok4vc&st=tre85sbs&dl=1",
+            "https://www.dropbox.com/scl/fi/eyec4m2v530v40wi9z6p7/audio3.mp3?rlkey=08ggipsackwxl3de4ajcalscc&st=idkbm2kd&dl=1",
+            "https://www.dropbox.com/scl/fi/i4l88iv8ht6qljf73vd04/audio4.mp3?rlkey=pqzm76y2xezojj37p6ol3tcpz&st=fbdo9cxf&dl=1"
+        ];
+
+        let clickCount = 0;
+        let isWhatsAppVisited = false;
+        let isPasswordEntered = false;
+
+        function getRandomItem(arr) {
+            const randomIndex = Math.floor(Math.random() * arr.length);
+            return arr[randomIndex];
+        }
+
+        function toggleRandomButton() {
+            const contentType = document.getElementById("content-type").value;
+            const randomButton = document.getElementById("random-button");
+            randomButton.style.display = contentType ? 'block' : 'none';
+            document.getElementById("content-display").innerHTML = '';
+            document.getElementById("audio-player-container").innerHTML = ''; // Limpiar el contenedor del audio
+        }
+
+        function attemptShowRandomContent() {
+            if (isPasswordEntered) {
+                showRandomContent();
+            } else {
+                clickCount++;
+                if (clickCount >= 2 && !isWhatsAppVisited) {
+                    showModal();
+                } else {
+                    showRandomContent();
+                }
+            }
+        }
+
+        function showModal() {
+            document.getElementById("love-modal").style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById("love-modal").style.display = "none";
+        }
+
+        function openWhatsApp() {
+            window.open("https://wa.me/526642747219?text=Hola,%20miamor", "_blank");
+            isWhatsAppVisited = true;
+            closeModal();
+        }
+
+        function showRandomContent() {
+            const contentType = document.getElementById("content-type").value;
+            const contentDisplay = document.getElementById("content-display");
+            contentDisplay.innerHTML = ''; // Limpiar contenido anterior
+
+            let randomContent;
+
+            if (contentType === 'photos') {
+                randomContent = getRandomItem(photos);
+                contentDisplay.innerHTML = `<img src="${randomContent}" alt="Random Photo">`;
+            } else if (contentType === 'videos') {
+                randomContent = getRandomItem(videos);
+                contentDisplay.innerHTML = `<video controls><source src="${randomContent}" type="video/mp4">Tu navegador no soporta video.</video>`;
+            }
+
+            // Mostrar reproductores de audio
+            showAudioPlayers();
+        }
+
+        function showAudioPlayers() {
+            const audioContainer = document.getElementById("audio-player-container");
+            audioContainer.innerHTML = ''; // Limpiar contenido anterior
+
+            audios.forEach((audioSrc, index) => {
+                const audioPlayer = document.createElement("audio");
+                audioPlayer.controls = true;
+                audioPlayer.src = audioSrc;
+                audioPlayer.innerHTML = `Reproductor de Audio ${index + 1}`;
+                audioContainer.appendChild(audioPlayer);
+            });
+
+            // Mensaje para ingresar la contraseña
+            const passwordPrompt = document.createElement("p");
+            passwordPrompt.innerHTML = 'Ingresa la contraseña para tener usos infinitos muejeje:';
+            audioContainer.appendChild(passwordPrompt);
+
+           // Campo para ingresar la contraseña
+const passwordInput = document.createElement("input");
+passwordInput.type = "password"; // Cambiado a tipo 'password'
+passwordInput.placeholder = "Escribe tu contraseña aquí";
+audioContainer.appendChild(passwordInput);
+
+// Manejar el evento 'Enter'
+passwordInput.addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+        checkPassword();
+    }
+});
+
+// Botón para enviar la contraseña
+const passwordButton = document.createElement("button");
+passwordButton.innerText = "Enviar Contraseña";
+passwordButton.onclick = checkPassword; // Cambiar a una función separada
+audioContainer.appendChild(passwordButton);
+
+function checkPassword() {
+    if (passwordInput.value === "te amo mucho") {
+        isPasswordEntered = true;
+        showSuccessMessage(); // Muestra mensaje de éxito
+        passwordInput.value = ""; // Limpiar el campo
+    } else {
+        alert("Contraseña incorrecta. Inténtalo de nuevo.");
+    }
+}
+
+// Función para mostrar el mensaje de éxito
+function showSuccessMessage() {
+    const modalContent = document.createElement("div");
+    modalContent.className = "modal-content";
+    modalContent.innerHTML = `<p>tramposa</p><button onclick="closeSuccessModal()">Cerrar</button>`;
+    
+    const successModal = document.createElement("div");
+    successModal.className = "modal";
+    successModal.onclick = closeSuccessModal; // Cerrar al hacer clic fuera del modal
+    successModal.appendChild(modalContent);
+    
+    document.body.appendChild(successModal); // Agregar el modal al body
+    successModal.style.display = "block"; // Mostrar el modal
+}
+
+function closeSuccessModal() {
+    const modal = document.querySelector(".modal");
+    if (modal) {
+        modal.style.display = "none";
+        modal.remove(); // Eliminar el modal del DOM
+    }
+
+            };
+            audioContainer.appendChild(passwordButton);
+        }
+    </script>
+</body>
+</html>
